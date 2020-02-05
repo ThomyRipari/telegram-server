@@ -19,7 +19,9 @@ messages_sub_router.post("/", (req, res) => {
 })
 
 messages_sub_router.get("/", (req, res) => {
-	controllers.getMessages()
+	const user_filter = req.query.user || null
+
+	controllers.getMessages(user_filter)
 
 	.then((messages) => {
 		response.success(req, res, 200, messages)
@@ -27,6 +29,30 @@ messages_sub_router.get("/", (req, res) => {
 
 	.catch(() => {
 		response.error(req, res, 500, "No se han podido obtener los mensajes")
+	})
+})
+
+messages_sub_router.patch("/:id", (req, res) => {
+	controllers.updateMessage(req.params.id, req.body.text)
+
+	.then((message) => {
+		response.success(req, res, 200, message)
+	})
+
+	.catch(() => {
+		response.error(req, res, 500, "No se ha podido actualizar el mensaje")
+	})
+})
+
+messages_sub_router.delete("/:id", (req, res) => {
+	controllers.deleteMessage(req.params.id)
+
+	.then(_ => {
+		response.success(req, res, 200, `Message ${req.params.id} deleted`)
+	})
+
+	.catch(err => {
+		response.error(req, res, 500, err)
 	})
 })
 
