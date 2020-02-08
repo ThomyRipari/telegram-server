@@ -1,13 +1,16 @@
 const express = require("express")
+const multer = require("multer")
 const response = require("../../response/")
 const controllers = require("./controllers")
 
-const messages_sub_router = express.Router()
+let upload = multer({dest: 'public/files/'})
 
-messages_sub_router.post("/", (req, res) => {
-	const { user, message } = req.body
+let messages_sub_router = express.Router()
 
-	controllers.newMessage(user, message)
+messages_sub_router.post("/", upload.single('file'), (req, res) => {
+	const { chat, user, message } = req.body
+
+	controllers.newMessage(chat, user, message, req.file)
 
 	.then((new_message) => {
 		response.success(req, res, 201, new_message)
@@ -18,17 +21,17 @@ messages_sub_router.post("/", (req, res) => {
 	})
 })
 
-messages_sub_router.get("/", (req, res) => {
-	const user_filter = req.query.user || null
+messages_sub_router.get("/:chatId", (req, res) => {
+	const chat_filter = req.params.chatId
 
-	controllers.getMessages(user_filter)
+	controllers.getMessages(chat_filter)
 
 	.then((messages) => {
 		response.success(req, res, 200, messages)
 	})
 
-	.catch(() => {
-		response.error(req, res, 500, "No se han podido obtener los mensajes")
+	.catch((err) => {
+		response.error(req, res, 500, err)
 	})
 })
 
@@ -39,8 +42,8 @@ messages_sub_router.patch("/:id", (req, res) => {
 		response.success(req, res, 200, message)
 	})
 
-	.catch(() => {
-		response.error(req, res, 500, "No se ha podido actualizar el mensaje")
+	.catch((err) => {
+		response.error(req, res, 500, err)
 	})
 })
 

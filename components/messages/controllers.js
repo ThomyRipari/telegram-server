@@ -1,39 +1,62 @@
 const store = require('./store')
 
-const newMessage = (user, message) => {
+const newMessage = (chat, user, message, file) => {
 	return new Promise((resolve, reject) => {
-		if (!user || !message) {
+		if (!user || !message || !chat) {
 			reject("Invalid Data")
 			return
 		} else {
+			let file_url = ''
+			console.log(file)
+
+			if (file) {
+				file_url = 'http://localhost:3000/app/public/files/' + file.filename
+			}
+
 			const new_message = {
+				chat,
 				user,
 				message,
-				date: new Date()
+				date: new Date(),
+				file: file_url
 			}
 
 			store.add(new_message)
 
-			resolve(new_message)
-			return
+			.then(_ => {
+				resolve(new_message)
+				return
+			})
+
+			.catch(_ => {
+				reject("No se ha podido guardar el mensaje")
+				return
+			})
+
 		}
 	})
 }
 
-const getMessages = (user_filter) => {
-	return new Promise((resolve, reject) => {
-		resolve(store.list(user_filter))
-	})
+const getMessages = (chat_filter) => {
+	return store.list(chat_filter)
 }
 
 const updateMessage = (id, text) => {
-	return new Promise(async (resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		if (!id || !text) {
 			reject("Invalid Data")
 			return
 		} else {
-			const message = await store.update(id, text)
-			resolve(message)
+			store.update(id, text)
+
+			.then((message) => {
+				resolve(message)
+			})
+
+			.catch(_ => {
+				reject("No se ha podido actualizar el mensaje")
+			})
+
 			return
 		}		
 	})
