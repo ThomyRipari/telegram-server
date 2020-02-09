@@ -1,14 +1,21 @@
 const express = require("express")
-const connect_db = require("./db")
+const socket = require('./socket')
 const bodyParser = require("body-parser")
-const router = require("./router/")
-
-connect_db('mongodb://:@cluster0-shard-00-00-u9by7.mongodb.net:27017,cluster0-shard-00-01-u9by7.mongodb.net:27017,cluster0-shard-00-02-u9by7.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority')
 
 const app = express()
+const server = require('http').createServer(app)
+
+const config = require('./config')
+const connect_db = require("./db")
+const router = require("./router/")
+
+connect_db(config.DB_URL)
+
 app.use(bodyParser.json())
-app.use('/app', express.static('public'))
+app.use(config.PUBLIC_URL, express.static('public'))
+
+socket.connect(server)
 
 router(app);
 
-app.listen(3000)
+server.listen(config.SERVER_PORT)

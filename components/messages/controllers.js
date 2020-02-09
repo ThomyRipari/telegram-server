@@ -1,4 +1,5 @@
 const store = require('./store')
+const socket = require('../../socket').socket
 
 const newMessage = (chat, user, message, file) => {
 	return new Promise((resolve, reject) => {
@@ -7,7 +8,6 @@ const newMessage = (chat, user, message, file) => {
 			return
 		} else {
 			let file_url = ''
-			console.log(file)
 
 			if (file) {
 				file_url = 'http://localhost:3000/app/public/files/' + file.filename
@@ -23,12 +23,14 @@ const newMessage = (chat, user, message, file) => {
 
 			store.add(new_message)
 
-			.then(_ => {
+			.then(() => {
+				socket.io.emit('Message', new_message)
+
 				resolve(new_message)
 				return
 			})
 
-			.catch(_ => {
+			.catch(() => {
 				reject("No se ha podido guardar el mensaje")
 				return
 			})
@@ -53,7 +55,7 @@ const updateMessage = (id, text) => {
 				resolve(message)
 			})
 
-			.catch(_ => {
+			.catch(() => {
 				reject("No se ha podido actualizar el mensaje")
 			})
 

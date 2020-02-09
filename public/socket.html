@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		
+		var socket = io.connect("http://localhost:3000", {
+			forceNew: true
+		})
+
+		socket.on('Message', function (data) {
+			console.log(data)
+		})
+
+	</script>
+</body>
+</html>
