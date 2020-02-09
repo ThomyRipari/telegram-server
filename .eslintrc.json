@@ -3,6 +3,11 @@
 		"ecmaVersion": 2018
 	},
 
+  	"plugins": ["prettier"],
+  	"rules": {
+    	"prettier/prettier": "error"
+  	},
+
 	"extends": ["eslint:recommended", "prettier"],
 
 	"env": {
